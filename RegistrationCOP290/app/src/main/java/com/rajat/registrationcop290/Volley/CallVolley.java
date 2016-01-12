@@ -25,7 +25,7 @@ public class CallVolley {
         {
                 pDialog=  Tools.showProgressBar(context);
 
-                RequestQueue queue = VolleySingleton.getInstance(context).getRequestQueue();
+                //RequestQueue queue = VolleySingleton.getInstance(context).getRequestQueue();
 
                         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
                         {
@@ -62,6 +62,7 @@ public class CallVolley {
                                 @Override
                                 protected Map<String, String> getParams()
                                 {
+                                        Log.i("rajat", " onResponseParamsExecute");
                                         Map<String, String> params = new HashMap<String, String>();
 
                                         try {
@@ -73,6 +74,7 @@ public class CallVolley {
                                                 params.put("name2",name2);
                                                 params.put("entry3",entrynum3);
                                                 params.put("name3",name3);
+                                                Log.i("rajat","request: "+params);
                                         }
                                         catch (Exception e)
                                         {
@@ -105,7 +107,7 @@ public class CallVolley {
                                                 {
                                                         Tools.showAlertDialog("Data not posted!",con);
                                                 }
-                                                else if(message.equals("User Already Registered"))
+                                                else if(message.equals("User already registered"))
                                                 {
                                                         Tools.showAlertDialog("User Already Registered",con);
                                                 }
