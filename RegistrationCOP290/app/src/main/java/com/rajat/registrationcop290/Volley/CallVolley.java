@@ -21,7 +21,7 @@ public class CallVolley {
                 jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         }
 
-        public static void makeSubmissionCall(String url, final String teamname,final String entrynum1,final String name1,final String entrynum2,final String name2,final String entrynum3,final String name3, final Context context)
+        public static void makeRegistrationCall(String url, final String teamname,final String entrynum1,final String name1,final String entrynum2,final String name2,final String entrynum3,final String name3, final Context context)
         {
                 pDialog=  Tools.showProgressBar(context);
 
