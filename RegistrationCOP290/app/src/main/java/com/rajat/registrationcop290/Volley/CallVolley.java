@@ -2,6 +2,7 @@ package com.rajat.registrationcop290.Volley;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.util.Log;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -9,12 +10,14 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.rajat.registrationcop290.R;
 import com.rajat.registrationcop290.Tools.Tools;
 import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 public class CallVolley {
         private static ProgressDialog pDialog;
+        static MediaPlayer dsound;
 
         private static void setCustomRetryPolicy(StringRequest jsonObjReq) {
                 Log.i("rajat", "setCustomRetryPolicy");
@@ -106,10 +109,12 @@ public class CallVolley {
                                                 if(message.equals("Data not posted!"))
                                                 {
                                                         Tools.showAlertDialog("Data not posted!",con);
+                                                       // dsound = MediaPlayer.create(this,R.raw.data_not_posted);
                                                 }
                                                 else if(message.equals("User already registered"))
                                                 {
                                                         Tools.showAlertDialog("User Already Registered",con);
+                                                        //dsound = MediaPlayer.create(this,R.raw.User_already_registered);
                                                 }
                                         }
                                         else
@@ -117,6 +122,7 @@ public class CallVolley {
                                                 if(message.equals("Registration completed"))
                                                 {
                                                         Tools.showAlertDialog("Registration completed",con);
+                                                        //dsound = MediaPlayer.create(this,R.raw.registration_completed);
 
 
                                                 }

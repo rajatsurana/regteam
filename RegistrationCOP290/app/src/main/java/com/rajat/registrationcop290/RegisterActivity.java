@@ -1,5 +1,6 @@
 package com.rajat.registrationcop290;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,14 +21,17 @@ import java.io.UnsupportedEncodingException;
 public class RegisterActivity extends AppCompatActivity {
     Toolbar toolbar;
     int titleId;
-
+    //media player object to play sound
+    MediaPlayer sound;
+    //Edit_text boxes for user input
     EditText teamName,
             entryNum1, entryNum2, entryNum3,
             name1, name2, name3;
-
+    //String object to get data entrd by user
     String TeamName="",
             entryNumber1="", entryNumber2="", entryNumber3="",
             studentName1="", studentName2="", studentName3="";
+    // button for registration
     Button submit;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
         setTitle((Html.fromHtml("<font color=\"#FFFFFF\">" + "Registration COP290" + "</font>")));
         initializeViews();
     }
+    //method to initialize all objects
     public void initializeViews(){
         teamName = (EditText)findViewById(R.id.team_name);
         entryNum1 = (EditText)findViewById(R.id.EntryNum1);
@@ -62,6 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
+    //method implemented after submit is clicked
     public void onSubmitClick(){
         TeamName =teamName.getText().toString();
         entryNumber1=entryNum1.getText().toString();
@@ -84,6 +90,7 @@ public class RegisterActivity extends AppCompatActivity {
             Tools.showAlertDialog("Internet Unavailable", RegisterActivity.this);
         }
     }
+    // method that will check if entered entry number is correct or not
     public boolean checkEntry(String entryNumber) throws UnsupportedEncodingException {
         int len = entryNumber.length();
         if(len != 11){
@@ -134,6 +141,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         return true;
     }
+    //method to check if entered name is correct or not(name cannot have numbers and special characters)
     public boolean checkName(String studentName) throws UnsupportedEncodingException {
         int len = studentName.length();
         if(len == 0){
@@ -156,6 +164,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         return true;
     }
+    //apply checkname and checkEntry methods to entered data
     public void validate(){
         boolean entries=false;
         boolean cforentry1 = true;
@@ -238,7 +247,7 @@ public class RegisterActivity extends AppCompatActivity {
             entries = true;
         }
 
-
+      //if all entries are correct then it will send data to server
         if(entries){
 
             Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
@@ -247,25 +256,34 @@ public class RegisterActivity extends AppCompatActivity {
                //     entryNumber2, studentName2,
                 //    entryNumber3, studentName3, RegisterActivity.this);
         }else{
-            if(cforentry1 == false ){
-                entryNum1.setText("");
+            if(cforteamName == false){
+                sound = MediaPlayer.create(this,R.raw.team_name);
+                sound.start();
+            }else if(cforentry1 == false ){
+                sound = MediaPlayer.create(this,R.raw.sentry1);
+                sound.start();
 
             }
-            if( cforentry2 == false){
-                entryNum2.setText("");
+            else if( cforentry2 == false){
+                sound = MediaPlayer.create(this,R.raw.sentry2);
+                sound.start();
             }
-            if(cforentry3 == false ){
-                entryNum3.setText("");
+            else if(cforentry3 == false ){
+                sound = MediaPlayer.create(this,R.raw.sentry3);
+                sound.start();
             }
-            if(cforStudentName1 == false ){
-                name1.setText("");
+            else if(cforStudentName1 == false ){
+                sound = MediaPlayer.create(this,R.raw.name);
+                sound.start();
             }
-            if(cforStudentName2 == false ){
-                name2.setText("");
+            else if(cforStudentName2 == false ){
+                sound = MediaPlayer.create(this,R.raw.name);
+                sound.start();
+            }else if(cforStudentName3 == false ){
+                sound = MediaPlayer.create(this,R.raw.name);
+                sound.start();
             }
-            if(cforStudentName3 == false ){
-                name3.setText("");
-            }
+
             Toast.makeText(RegisterActivity.this,"Invalid fields have been cleared up",Toast.LENGTH_SHORT).show();
         }
     }
