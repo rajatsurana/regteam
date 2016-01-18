@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.rajat.registrationcop290.Tools.CheckNetwork;
 import com.rajat.registrationcop290.Tools.CustomTextWatcher;
 import com.rajat.registrationcop290.Tools.Tools;
+import com.rajat.registrationcop290.Tools.Validate;
 import com.rajat.registrationcop290.Volley.CallVolley;
 import com.rajat.registrationcop290.Volley.VolleySingleton;
 
@@ -47,13 +48,13 @@ public class RegisterActivity extends AppCompatActivity {
         name1 = (EditText)findViewById(R.id.Name1);
         name2 = (EditText)findViewById(R.id.Name2);
         name3 = (EditText)findViewById(R.id.Name3);
-        teamName.addTextChangedListener(new CustomTextWatcher(teamName));
-        entryNum1.addTextChangedListener(new CustomTextWatcher(entryNum1));
-        entryNum2.addTextChangedListener(new CustomTextWatcher(entryNum2));
-        entryNum3.addTextChangedListener(new CustomTextWatcher(entryNum3));
-        name1.addTextChangedListener(new CustomTextWatcher(name1));
-        name2.addTextChangedListener(new CustomTextWatcher(name2));
-        name3.addTextChangedListener(new CustomTextWatcher(name3));
+        teamName.addTextChangedListener(new CustomTextWatcher(teamName,0));
+        entryNum1.addTextChangedListener(new CustomTextWatcher(entryNum1,1));
+        entryNum2.addTextChangedListener(new CustomTextWatcher(entryNum2,1));
+        entryNum3.addTextChangedListener(new CustomTextWatcher(entryNum3,1));
+        name1.addTextChangedListener(new CustomTextWatcher(name1,2));
+        name2.addTextChangedListener(new CustomTextWatcher(name2,2));
+        name3.addTextChangedListener(new CustomTextWatcher(name3,2));
         submit =(Button)findViewById(R.id.submitNames);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +64,8 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
     public void onSubmitClick(){
+        Validate validate1=new Validate();
+        boolean invalid=false;
         TeamName =teamName.getText().toString();
         entryNumber1=entryNum1.getText().toString();
         entryNumber2=entryNum2.getText().toString();
@@ -70,13 +73,15 @@ public class RegisterActivity extends AppCompatActivity {
         studentName1=name1.getText().toString();
         studentName2=name2.getText().toString();
         studentName3=name3.getText().toString();
-
+        if(!(validate1.validate_entryno(entryNumber1)||validate1.validate_entryno(entryNumber2)||validate1.validate_entryno(entryNumber3)||validate1.validate_name(studentName1)||validate1.validate_name(studentName2)||validate1.validate_name(studentName3))){
+            return;
+        }
         //Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
         CheckNetwork chkNet = new CheckNetwork(RegisterActivity.this);
         String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
         if(chkNet.checkNetwork()){
             VolleySingleton.getInstance(RegisterActivity.this).getRequestQueue().getCache().clear();
-            validate();
+            //validate();
             //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
               //      entryNumber2, studentName2,
                 //    entryNumber3, studentName3, RegisterActivity.this);
