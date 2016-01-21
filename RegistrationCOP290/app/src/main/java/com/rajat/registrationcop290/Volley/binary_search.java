@@ -23,7 +23,7 @@ public class binary_search {
     private int search_index(String key,String[] array,int inital,int last){
         int mid =(last-inital)/2;
         if(mid<=0)throw new NullPointerException();
-        if(key.contentEquals(array[mid]))return mid;
+        if(key.contentEquals(array[mid].substring(0,key.length())))return mid;
         else if((key.compareToIgnoreCase(array[mid])>0))return search_index(key,array,mid,last);
         else return search_index(key,array,inital,mid);
     }
