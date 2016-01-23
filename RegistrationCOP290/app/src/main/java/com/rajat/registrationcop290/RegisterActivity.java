@@ -111,37 +111,68 @@ public class RegisterActivity extends AppCompatActivity {
         studentName1=name1.getText().toString().toUpperCase();
         studentName2=name2.getText().toString().toUpperCase();
         studentName3=name3.getText().toString().toUpperCase();
-        if((validate1.validate_entryno(entryNumber1)&&validate1.validate_entryno(entryNumber2)&& validate1.validate_entryno(entryNumber3)&& validate1.validate_name(studentName1)&& validate1.validate_name(studentName2)&& validate1.validate_name(studentName3))) {
+        boolean valid=false;
+        if(   teamName.getText().length()>0
+                && validate1.validate_entryno(entryNumber1)&& validate1.validate_name(studentName1)
+                && validate1.validate_entryno(entryNumber2)&& validate1.validate_name(studentName2)
+                && !entryNumber1.equals(entryNumber2) && !studentName2.equals(studentName1)
+                ) {
 
-            //Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
-            CheckNetwork chkNet = new CheckNetwork(RegisterActivity.this);
-            String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
-            if (chkNet.checkNetwork()) {
-                VolleySingleton.getInstance(RegisterActivity.this).getRequestQueue().getCache().clear();
-
-                //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
-                //      entryNumber2, studentName2,
-                //    entryNumber3, studentName3, RegisterActivity.this);
-            } else {
-                Tools.showAlertDialog("Internet Unavailable", RegisterActivity.this);
+            if(entryNum3.getText().length()>0 || name3.getText().length()>0){
+                if(validate1.validate_entryno(entryNumber3)&& validate1.validate_name(studentName3)
+                        && !entryNumber1.equals(entryNumber3) && !entryNumber3.equals(entryNumber2)
+                        && !studentName2.equals(studentName3) && !studentName3.equals(studentName1)
+                        ){
+                    valid=true;
+                }else{
+                    if (sound == null) {
+                        if (!validate1.validate_entryno(entryNumber3)) {
+                            sound = MediaPlayer.create(this, R.raw.sentry3);
+                        } else if (!validate1.validate_name(studentName3)) {
+                            sound = MediaPlayer.create(this, R.raw.names3);
+                        }else if(entryNumber1.equals(entryNumber3)){
+                            sound = MediaPlayer.create(this, R.raw.similar_entry);////////////////
+                        }else if(entryNumber2.equals(entryNumber3)){
+                            sound = MediaPlayer.create(this, R.raw.similar_entry);////////////////
+                        }else if(studentName3.equals(studentName1)){
+                            sound = MediaPlayer.create(this, R.raw.similar_names);////////////////
+                        }else if(studentName2.equals(studentName3)){
+                            sound = MediaPlayer.create(this, R.raw.similar_names);////////////////
+                        }
+                        sound.start();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                sound.release();
+                                sound = null;
+                            }
+                        }, sound.getDuration());
+                    }else {
+                        Toast.makeText(RegisterActivity.this, "Have some patience duh...", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }else{
+                valid=true;
             }
+            //Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
+
         }else{
             if (sound == null) {
-                if(!validate1.validate_entryno(entryNumber1)){
+                if(teamName.getText().length()==0){
+                    sound = MediaPlayer.create(this, R.raw.team);
+                }else if(!validate1.validate_entryno(entryNumber1)){
                     sound = MediaPlayer.create(this, R.raw.sentry1);
                 }else if(!validate1.validate_entryno(entryNumber2)){
                     sound = MediaPlayer.create(this, R.raw.sentry2);
-                }else if(!validate1.validate_entryno(entryNumber3)){
-                    sound = MediaPlayer.create(this, R.raw.sentry3);
-                }else if(!validate1.validate_name(studentName1)|| !validate1.validate_name(studentName2) ||!validate1.validate_name(studentName3)){
-                    sound = MediaPlayer.create(this, R.raw.name);
+                }else  if(!validate1.validate_name(studentName1) ){
+                    sound = MediaPlayer.create(this, R.raw.names1);
+                }else  if(!validate1.validate_name(studentName2) ){
+                    sound = MediaPlayer.create(this, R.raw.names2);
+                }else if(entryNumber1.equals(entryNumber2)){
+                    sound = MediaPlayer.create(this, R.raw.similar_entry);////////////////
+                }else if(studentName2.equals(studentName1)){
+                    sound = MediaPlayer.create(this, R.raw.similar_names);
                 }
-               // sound = MediaPlayer.create(RegisterActivity.this, R.raw.team_name);
-                //sound = MediaPlayer.create(this, R.raw.sentry1);
-
-                //dsound = MediaPlayer.create(con,R.raw.data_not_posted);
-                //dsound = MediaPlayer.create(con,R.raw.user_already_registered);
-                //dsound = MediaPlayer.create(con,R.raw.registration_completed);
                 sound.start();
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -152,6 +183,19 @@ public class RegisterActivity extends AppCompatActivity {
                 }, sound.getDuration());
             }else {
                 Toast.makeText(RegisterActivity.this, "Have some patience duh...", Toast.LENGTH_SHORT).show();
+            }
+        }
+        if(valid){
+            CheckNetwork chkNet = new CheckNetwork(RegisterActivity.this);
+            String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
+            if (chkNet.checkNetwork()) {
+                VolleySingleton.getInstance(RegisterActivity.this).getRequestQueue().getCache().clear();
+
+                //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
+                //      entryNumber2, studentName2,
+                //    entryNumber3, studentName3, RegisterActivity.this);
+            } else {
+                Tools.showAlertDialog("Internet Unavailable", RegisterActivity.this);
             }
         }
     }

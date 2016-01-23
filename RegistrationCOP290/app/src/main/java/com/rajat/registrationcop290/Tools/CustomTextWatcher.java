@@ -103,7 +103,13 @@ public class CustomTextWatcher implements TextWatcher {
                 cvSelect();
             }
             else{
-                eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                if(eText.getText().length()==0) {
+                    eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.cclose, 0);
+                }
+                else{
+                    eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ccheck, 0);
+                }
+                //eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
             }
         }
@@ -118,9 +124,9 @@ public void cvDrop(){
     cv.setVerticalScrollBarEnabled(true);
     cv.setDropDownBackgroundResource(R.color.ultraLightGray);
     //cv.setDropDownHeight(400);
-    cv.setDropDownHeight(eText.getHeight()*5);
-    
-    cv.setDropDownWidth(eText.getWidth());
+    //cv.setDropDownHeight(eText.getHeight() * 5);
+    //Log.i("rajat", cv.getLineCount()+": cv.getLineCount()"+ cv.getAdapter().getCount());
+    cv.setDropDownWidth(eText.getWidth()/2);
     cv.setDropDownHorizontalOffset(edTextLocation[0]);
     cv.setDropDownVerticalOffset(edTextLocation[1] + eText.getHeight());
    /* Handler h = new Handler();
@@ -146,7 +152,19 @@ public void cvDrop(){
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    Log.i("rajat", cv.getLineCount()+": cv.getLineCount()"+ cv.getAdapter().getCount());
                     if (dropOrNot) {
+                        if (cv.getAdapter().getCount() == 0) {
+                            cv.setDropDownHeight(0);
+                        } else if (cv.getAdapter().getCount() == 1) {
+                            cv.setDropDownHeight(eText.getHeight() );
+                        }  else if (cv.getAdapter().getCount() == 2) {
+                            cv.setDropDownHeight(eText.getHeight() * 3);
+                        } else if (cv.getAdapter().getCount() == 3) {
+                            cv.setDropDownHeight(eText.getHeight() * 4);
+                        } else {
+                            cv.setDropDownHeight(eText.getHeight() * 5);
+                        }
                         cv.showDropDown();
                     }
                 }

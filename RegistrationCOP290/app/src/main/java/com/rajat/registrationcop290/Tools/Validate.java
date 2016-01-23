@@ -37,6 +37,9 @@ public class Validate{
                 return false;
             }
         }
+        if(text.length()==0){
+            return false;
+        }
         return true;
     }
 }
