@@ -1,15 +1,23 @@
 package com.rajat.registrationcop290;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.InputType;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.rajat.registrationcop290.Tools.CheckNetwork;
+import com.rajat.registrationcop290.Tools.CustomAutoCompleteView;
 import com.rajat.registrationcop290.Tools.CustomTextWatcher;
+import com.rajat.registrationcop290.Tools.Student;
 import com.rajat.registrationcop290.Tools.Tools;
 import com.rajat.registrationcop290.Tools.Validate;
 import com.rajat.registrationcop290.Volley.CallVolley;
@@ -19,9 +27,15 @@ import java.io.UnsupportedEncodingException;
 
 
 public class RegisterActivity extends AppCompatActivity {
+    MediaPlayer sound = null;
     Toolbar toolbar;
     int titleId;
-
+    CustomAutoCompleteView cacv;
+    public ArrayAdapter<String> enAdap;
+    CustomAutoCompleteView cacvName;
+    public ArrayAdapter<String> nameAdap;
+    public String[] enNums = new String[] {"Please search...","Don't search...","Please search...","Don't search...","Please search...","Don't search..."};
+    public String[] stdNames = new String[] {"Please search...","Don't search...","Please search...","Don't search...","Please search...","Don't search..."};
     EditText teamName,
             entryNum1, entryNum2, entryNum3,
             name1, name2, name3;
@@ -38,6 +52,12 @@ public class RegisterActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         titleId = getResources().getIdentifier("action_bar_title", "id", "android");
         setTitle((Html.fromHtml("<font color=\"#FFFFFF\">" + "Registration COP290" + "</font>")));
+        Student.getS();
+        //ugetS();
+        Student.getEntryNum();
+        Student.getNames();
+        enNums=Student.studentEntryNum;
+        stdNames=Student.studentNames;
         initializeViews();
     }
     public void initializeViews(){
@@ -48,13 +68,33 @@ public class RegisterActivity extends AppCompatActivity {
         name1 = (EditText)findViewById(R.id.Name1);
         name2 = (EditText)findViewById(R.id.Name2);
         name3 = (EditText)findViewById(R.id.Name3);
+        cacv = new CustomAutoCompleteView(RegisterActivity.this);
+        cacvName= new CustomAutoCompleteView(RegisterActivity.this);
+
+        enAdap = new ArrayAdapter<String>(RegisterActivity.this, android.R.layout.simple_dropdown_item_1line, enNums);
+        nameAdap = new ArrayAdapter<String>(RegisterActivity.this, android.R.layout.simple_dropdown_item_1line, stdNames);
+        cacv.setThreshold(1);
+        cacv.setAdapter(enAdap);
+        enAdap.notifyDataSetChanged();
+        cacvName.setThreshold(1);
+        cacvName.setAdapter(nameAdap);
+        nameAdap.notifyDataSetChanged();
+
+        teamName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        entryNum1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        entryNum2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        entryNum3.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        //name1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        //name2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        //name3.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         teamName.addTextChangedListener(new CustomTextWatcher(teamName,0));
-        entryNum1.addTextChangedListener(new CustomTextWatcher(entryNum1,1));
-        entryNum2.addTextChangedListener(new CustomTextWatcher(entryNum2,1));
-        entryNum3.addTextChangedListener(new CustomTextWatcher(entryNum3,1));
-        name1.addTextChangedListener(new CustomTextWatcher(name1,2));
-        name2.addTextChangedListener(new CustomTextWatcher(name2,2));
-        name3.addTextChangedListener(new CustomTextWatcher(name3,2));
+        entryNum1.addTextChangedListener(new CustomTextWatcher(entryNum1,1,cacv,enAdap));
+
+        entryNum2.addTextChangedListener(new CustomTextWatcher(entryNum2,1,cacv,enAdap));
+        entryNum3.addTextChangedListener(new CustomTextWatcher(entryNum3,1,cacv,enAdap));
+        name1.addTextChangedListener(new CustomTextWatcher(name1,2,cacvName,nameAdap));
+        name2.addTextChangedListener(new CustomTextWatcher(name2,2,cacvName,nameAdap));
+        name3.addTextChangedListener(new CustomTextWatcher(name3,2,cacvName,nameAdap));
         submit =(Button)findViewById(R.id.submitNames);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,213 +105,142 @@ public class RegisterActivity extends AppCompatActivity {
     }
     public void onSubmitClick(){
         Validate validate1=new Validate();
-        boolean invalid=false;
+        //boolean invalid=false;
         TeamName =teamName.getText().toString();
-        entryNumber1=entryNum1.getText().toString();
-        entryNumber2=entryNum2.getText().toString();
-        entryNumber3=entryNum3.getText().toString();
-        studentName1=name1.getText().toString();
-        studentName2=name2.getText().toString();
-        studentName3=name3.getText().toString();
-        if(!(validate1.validate_entryno(entryNumber1)||validate1.validate_entryno(entryNumber2)||validate1.validate_entryno(entryNumber3)||validate1.validate_name(studentName1)||validate1.validate_name(studentName2)||validate1.validate_name(studentName3))){
+        entryNumber1=entryNum1.getText().toString().toUpperCase();
+        entryNumber2=entryNum2.getText().toString().toUpperCase();
+        entryNumber3=entryNum3.getText().toString().toUpperCase();
+        studentName1=name1.getText().toString().toUpperCase();
+        studentName2=name2.getText().toString().toUpperCase();
+        studentName3=name3.getText().toString().toUpperCase();
+        boolean valid=false;
+        if(   teamName.getText().length()>0
+                && validate1.validate_entryno(entryNumber1)&& validate1.validate_name(studentName1)
+                && validate1.validate_entryno(entryNumber2)&& validate1.validate_name(studentName2)
+                && !entryNumber1.equals(entryNumber2) && !studentName2.equals(studentName1)
+                ) {
+
+            if(entryNum3.getText().length()>0 || name3.getText().length()>0){
+                if(validate1.validate_entryno(entryNumber3)&& validate1.validate_name(studentName3)
+                        && !entryNumber1.equals(entryNumber3) && !entryNumber3.equals(entryNumber2)
+                        && !studentName2.equals(studentName3) && !studentName3.equals(studentName1)
+                        ){
+                    valid=true;
+                }else{
+                    if (sound == null) {
+                        if (!validate1.validate_entryno(entryNumber3)) {
+                            sound = MediaPlayer.create(this, R.raw.sentry3);
+                        } else if (!validate1.validate_name(studentName3)) {
+                            sound = MediaPlayer.create(this, R.raw.names3);
+                        }else if(entryNumber1.equals(entryNumber3)){
+                            sound = MediaPlayer.create(this, R.raw.similar_entry);////////////////
+                        }else if(entryNumber2.equals(entryNumber3)){
+                            sound = MediaPlayer.create(this, R.raw.similar_entry);////////////////
+                        }else if(studentName3.equals(studentName1)){
+                            sound = MediaPlayer.create(this, R.raw.similar_names);////////////////
+                        }else if(studentName2.equals(studentName3)){
+                            sound = MediaPlayer.create(this, R.raw.similar_names);////////////////
+                        }
+                        sound.start();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                sound.release();
+                                sound = null;
+                            }
+                        }, sound.getDuration());
+                    }else {
+                        Toast.makeText(RegisterActivity.this, "Have some patience duh...", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }else{
+                valid=true;
+            }
+            //Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
+
+        }else{
+            if (sound == null) {
+                if(teamName.getText().length()==0){
+                    sound = MediaPlayer.create(this, R.raw.team);
+                }else if(!validate1.validate_entryno(entryNumber1)){
+                    sound = MediaPlayer.create(this, R.raw.sentry1);
+                }else  if(!validate1.validate_name(studentName1) ){
+                    sound = MediaPlayer.create(this, R.raw.names1);
+                }else if(!validate1.validate_entryno(entryNumber2)){
+                    sound = MediaPlayer.create(this, R.raw.sentry2);
+                }else  if(!validate1.validate_name(studentName2) ){
+                    sound = MediaPlayer.create(this, R.raw.names2);
+                }else if(entryNumber1.equals(entryNumber2)){
+                    sound = MediaPlayer.create(this, R.raw.similar_entry);////////////////
+                }else if(studentName2.equals(studentName1)){
+                    sound = MediaPlayer.create(this, R.raw.similar_names);
+                }
+                sound.start();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        sound.release();
+                        sound = null;
+                    }
+                }, sound.getDuration());
+            }else {
+                Toast.makeText(RegisterActivity.this, "Have some patience duh...", Toast.LENGTH_SHORT).show();
+            }
+        }
+        if(valid){
+            CheckNetwork chkNet = new CheckNetwork(RegisterActivity.this);
+            String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
+            if (chkNet.checkNetwork()) {
+                VolleySingleton.getInstance(RegisterActivity.this).getRequestQueue().getCache().clear();
+
+                //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
+                //      entryNumber2, studentName2,
+                //    entryNumber3, studentName3, RegisterActivity.this);
+            } else {
+                Tools.showAlertDialog("Internet Unavailable", RegisterActivity.this);
+            }
+        }else{
+            final Animation animat= AnimationUtils.loadAnimation(this, R.anim.shake);
+            submit.startAnimation(animat);
+            //int i=0;
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    submit.startAnimation(animat);
+                }
+            },100);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    submit.startAnimation(animat);
+                }
+            }, 200);
+
+
+
+
+        }
+    }
+    boolean doubleBackToExitPressedOnce=false;
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
             return;
         }
-        //Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
-        CheckNetwork chkNet = new CheckNetwork(RegisterActivity.this);
-        String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
-        if(chkNet.checkNetwork()){
-            VolleySingleton.getInstance(RegisterActivity.this).getRequestQueue().getCache().clear();
-            //validate();
-            //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
-              //      entryNumber2, studentName2,
-                //    entryNumber3, studentName3, RegisterActivity.this);
-        }else{
-            Tools.showAlertDialog("Internet Unavailable", RegisterActivity.this);
-        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Press BACK again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
     }
-    public boolean checkEntry(String entryNumber) throws UnsupportedEncodingException {
-        int len = entryNumber.length();
-        if(len != 11){
-            return false;
-        }else{
-            String str = entryNumber.substring(0,4);
-            int year = Integer.parseInt(str);
 
-            byte[] ye = str.getBytes("US-ASCII");
-
-            for(int i = 0; i < ye.length ; i++){
-                if(ye[i]<48 || ye[i] > 57){
-                    return false;
-                }
-            }
-
-            if(year < 2010 || year > 2014 ){
-                return false;
-            }else{
-                String dep = entryNumber.substring(4,6);
-                byte[] de = dep.getBytes("US-ASCII");
-
-                for(int i = 0; i < de.length ; i++){
-                    if(de[i]> 90 || de[i] < 65){
-                        return false;
-                    }
-                }
-                Character forPhd = entryNumber.charAt(6);
-                int asc = (int) forPhd;
-                boolean tell = (asc >64 && asc < 91)||(asc>47 && asc < 58);
-                if(tell = false){
-                    return false;
-                }
-                String lastfour = entryNumber.substring(7,11);
-
-
-                byte[] lf = lastfour.getBytes("US-ASCII");
-
-                for(int i = 0; i < lf.length ; i++){
-                    if(lf[i]<48 || lf[i] > 57){
-                        return false;
-                    }
-                }
-
-            }
-
-        }
-
-        return true;
-    }
-    public boolean checkName(String studentName) throws UnsupportedEncodingException {
-        int len = studentName.length();
-        if(len == 0){
-            return false;
-        }else {
-
-
-            byte[] ye = studentName.getBytes("US-ASCII");
-
-            for (int i = 0; i < ye.length; i++) {
-                boolean charc = (ye[i] > 64 && ye[i] < 91) || (ye[i] == 32);
-                if (charc == false) {
-                    return false;
-                }
-            }
-        }
-
-
-
-
-        return true;
-    }
-    public void validate(){
-        boolean entries=false;
-        boolean cforentry1 = true;
-        boolean cforentry2 = true;
-        boolean cforentry3 = true;
-        boolean cforStudentName1 = true;
-        boolean cforStudentName2 = true;
-        boolean cforStudentName3 = true;
-        try {
-            cforentry1= checkEntry(entryNumber1);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        try {
-            cforentry2= checkEntry(entryNumber2);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        try {
-            cforentry3= checkEntry(entryNumber3);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        if(cforentry3 == false){
-            if(entryNumber3.length() == 0 && studentName3.length() == 0){
-                cforentry3 = true;
-            }
-        }
-        int teamNamelen = teamName.length();
-        boolean cforteamName = true;
-        if(teamNamelen == 0){
-            cforteamName = false;
-        }
-
-
-        try {
-            cforStudentName1 = checkName(studentName1);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        try {
-            cforStudentName2 = checkName(studentName2);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        try {
-            cforStudentName3 = checkName(studentName3);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-
-        int lenStuName3 = studentName3.length();
-        if(lenStuName3 == 0 && entryNumber3.length() == 0){
-            cforStudentName3 = true;
-        }
-        if(studentName1.equals(studentName2)){
-            cforStudentName2 = false;
-        }
-        if(studentName1.equals(studentName3)){
-            cforStudentName3 = false;
-        }
-        if(studentName2.equals(studentName3)){
-            cforStudentName3 = false;
-        }
-        if(entryNumber1.equals(entryNumber2)){
-            cforentry2= false;
-        }
-        if(entryNumber1.equals(entryNumber3)){
-            cforentry3= false;
-        }
-        if(entryNumber2.equals(entryNumber3)){
-            cforentry3= false;
-        }
-
-
-        boolean ch = cforentry1 && cforentry2 && cforentry3 && cforteamName && cforStudentName1 && cforStudentName2 && cforStudentName3;
-        if(ch){
-            entries = true;
-        }
-
-
-        if(entries){
-
-            Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
-            String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
-            //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
-               //     entryNumber2, studentName2,
-                //    entryNumber3, studentName3, RegisterActivity.this);
-        }else{
-            if(cforentry1 == false ){
-                entryNum1.setText("");
-
-            }
-            if( cforentry2 == false){
-                entryNum2.setText("");
-            }
-            if(cforentry3 == false ){
-                entryNum3.setText("");
-            }
-            if(cforStudentName1 == false ){
-                name1.setText("");
-            }
-            if(cforStudentName2 == false ){
-                name2.setText("");
-            }
-            if(cforStudentName3 == false ){
-                name3.setText("");
-            }
-            Toast.makeText(RegisterActivity.this,"Invalid fields have been cleared up",Toast.LENGTH_SHORT).show();
-        }
-    }
 }

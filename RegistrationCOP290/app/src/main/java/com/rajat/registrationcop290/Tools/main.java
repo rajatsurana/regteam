@@ -21,13 +21,15 @@ public class main {
 		array[13]="anurup";
 		array[14]="anur";
 		System.out.println(array.length);
-		mergesort mergesort=new mergesort(array);
+
+		new mergesort(array);
+
 		for(int i=0;i<15;i++){
 			System.out.println(array[i]);
 		}
 		LinkedList<String> list=new LinkedList<String>();
 		binary_search binary=new binary_search();
-		list=binary.search("anur", array);
+		list=binary.search("an", array);
 		for(int i=0;i<list.size();i++){
 			System.out.println(list.get(i));
 		}

@@ -1,7 +1,6 @@
 package com.rajat.registrationcop290.Tools;
 
 
-
 /**
  * Created by Lenovo on 1/19/2016.
  */
