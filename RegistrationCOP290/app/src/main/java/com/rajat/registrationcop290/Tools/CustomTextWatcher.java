@@ -21,9 +21,9 @@ public class CustomTextWatcher implements TextWatcher {
     @Override
     public void afterTextChanged(Editable editable) {
         if (editable.length() == 0) {
-            eText.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.home,0);
+            eText.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.ccheck,0);
         } else{
-            eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.about, 0);
+            eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.cclose, 0);
         }
     }
 }

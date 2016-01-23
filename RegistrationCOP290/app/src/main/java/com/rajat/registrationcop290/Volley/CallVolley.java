@@ -109,12 +109,15 @@ public class CallVolley {
                                                 if(message.equals("Data not posted!"))
                                                 {
                                                         Tools.showAlertDialog("Data not posted!",con);
-                                                       // dsound = MediaPlayer.create(this,R.raw.data_not_posted);
+                                                        dsound = MediaPlayer.create(con,R.raw.data_not_posted);
+                                                        dsound.start();
+
                                                 }
                                                 else if(message.equals("User already registered"))
                                                 {
                                                         Tools.showAlertDialog("User Already Registered",con);
-                                                        //dsound = MediaPlayer.create(this,R.raw.User_already_registered);
+                                                        dsound = MediaPlayer.create(con,R.raw.user_already_registered);
+                                                        dsound.start();
                                                 }
                                         }
                                         else
@@ -122,8 +125,8 @@ public class CallVolley {
                                                 if(message.equals("Registration completed"))
                                                 {
                                                         Tools.showAlertDialog("Registration completed",con);
-                                                        //dsound = MediaPlayer.create(this,R.raw.registration_completed);
-
+                                                        dsound = MediaPlayer.create(con,R.raw.registration_completed);
+                                                        dsound.start();
 
                                                 }
                                         }

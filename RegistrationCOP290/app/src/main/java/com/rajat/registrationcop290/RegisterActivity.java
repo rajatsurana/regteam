@@ -16,6 +16,8 @@ import com.rajat.registrationcop290.Volley.CallVolley;
 import com.rajat.registrationcop290.Volley.VolleySingleton;
 
 import java.io.UnsupportedEncodingException;
+import android.os.Handler;
+import java.util.logging.LogRecord;
 
 
 public class RegisterActivity extends AppCompatActivity {
@@ -43,7 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
         setTitle((Html.fromHtml("<font color=\"#FFFFFF\">" + "Registration COP290" + "</font>")));
         initializeViews();
     }
-    //method to initialize all objects
+    //method to initialize all views
     public void initializeViews(){
         teamName = (EditText)findViewById(R.id.team_name);
         entryNum1 = (EditText)findViewById(R.id.EntryNum1);
@@ -79,7 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         //Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
         CheckNetwork chkNet = new CheckNetwork(RegisterActivity.this);
-        String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
+        //String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
         if(chkNet.checkNetwork()){
             VolleySingleton.getInstance(RegisterActivity.this).getRequestQueue().getCache().clear();
             validate();
@@ -246,45 +248,56 @@ public class RegisterActivity extends AppCompatActivity {
         if(ch){
             entries = true;
         }
+        if( sound==null) {
+            //if all entries are correct then it will send data to server
+            if (entries) {
 
-      //if all entries are correct then it will send data to server
-        if(entries){
+                Toast.makeText(RegisterActivity.this, "Submit Clicked", Toast.LENGTH_SHORT).show();
+                String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
+                CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
+                        entryNumber2, studentName2,
+                        entryNumber3, studentName3, RegisterActivity.this);
+            } else {
 
-            Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
-            String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
-            //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
-               //     entryNumber2, studentName2,
-                //    entryNumber3, studentName3, RegisterActivity.this);
-        }else{
-            if(cforteamName == false){
-                sound = MediaPlayer.create(this,R.raw.team_name);
-                sound.start();
-            }else if(cforentry1 == false ){
-                sound = MediaPlayer.create(this,R.raw.sentry1);
-                sound.start();
+                if (cforteamName == false) {
+                    sound = MediaPlayer.create(this, R.raw.team_name);
+                    sound.start();
 
-            }
-            else if( cforentry2 == false){
-                sound = MediaPlayer.create(this,R.raw.sentry2);
-                sound.start();
-            }
-            else if(cforentry3 == false ){
-                sound = MediaPlayer.create(this,R.raw.sentry3);
-                sound.start();
-            }
-            else if(cforStudentName1 == false ){
-                sound = MediaPlayer.create(this,R.raw.name);
-                sound.start();
-            }
-            else if(cforStudentName2 == false ){
-                sound = MediaPlayer.create(this,R.raw.name);
-                sound.start();
-            }else if(cforStudentName3 == false ){
-                sound = MediaPlayer.create(this,R.raw.name);
-                sound.start();
-            }
+                } else if (cforentry1 == false) {
+                    sound = MediaPlayer.create(this, R.raw.sentry1);
+                    sound.start();
 
-            Toast.makeText(RegisterActivity.this,"Invalid fields have been cleared up",Toast.LENGTH_SHORT).show();
+                } else if (cforentry2 == false) {
+                    sound = MediaPlayer.create(this, R.raw.sentry2);
+                    sound.start();
+                } else if (cforentry3 == false) {
+                    sound = MediaPlayer.create(this, R.raw.sentry3);
+                    sound.start();
+                } else if (cforStudentName1 == false) {
+                    sound = MediaPlayer.create(this, R.raw.name);
+                    sound.start();
+                } else if (cforStudentName2 == false) {
+                    sound = MediaPlayer.create(this, R.raw.name);
+                    sound.start();
+                } else if (cforStudentName3 == false) {
+                    sound = MediaPlayer.create(this, R.raw.name);
+                    sound.start();
+
+                }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        sound.release();
+                        sound=null;
+                    }
+                }, sound.getDuration());
+
+
+
+                Toast.makeText(RegisterActivity.this, "Invalid fields have been cleared up", Toast.LENGTH_SHORT).show();
+            }
+        }else {
+            Toast.makeText(RegisterActivity.this, "Have some patience duh...", Toast.LENGTH_SHORT).show();
         }
     }
 }
