@@ -1,5 +1,6 @@
 package com.rajat.registrationcop290;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.rajat.registrationcop290.Tools.CheckNetwork;
 import com.rajat.registrationcop290.Tools.CustomAutoCompleteView;
 import com.rajat.registrationcop290.Tools.CustomTextWatcher;
+import com.rajat.registrationcop290.Tools.Student;
 import com.rajat.registrationcop290.Tools.Tools;
 import com.rajat.registrationcop290.Tools.Validate;
 import com.rajat.registrationcop290.Volley.CallVolley;
@@ -23,11 +25,15 @@ import java.io.UnsupportedEncodingException;
 
 
 public class RegisterActivity extends AppCompatActivity {
+    MediaPlayer sound = null;
     Toolbar toolbar;
     int titleId;
     CustomAutoCompleteView cacv;
     public ArrayAdapter<String> enAdap;
+    CustomAutoCompleteView cacvName;
+    public ArrayAdapter<String> nameAdap;
     public String[] enNums = new String[] {"Please search...","Don't search...","Please search...","Don't search...","Please search...","Don't search..."};
+    public String[] stdNames = new String[] {"Please search...","Don't search...","Please search...","Don't search...","Please search...","Don't search..."};
     EditText teamName,
             entryNum1, entryNum2, entryNum3,
             name1, name2, name3;
@@ -44,6 +50,12 @@ public class RegisterActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         titleId = getResources().getIdentifier("action_bar_title", "id", "android");
         setTitle((Html.fromHtml("<font color=\"#FFFFFF\">" + "Registration COP290" + "</font>")));
+        Student.getS();
+        //ugetS();
+        Student.getEntryNum();
+        Student.getNames();
+        enNums=Student.studentEntryNum;
+        stdNames=Student.studentNames;
         initializeViews();
     }
     public void initializeViews(){
@@ -55,9 +67,17 @@ public class RegisterActivity extends AppCompatActivity {
         name2 = (EditText)findViewById(R.id.Name2);
         name3 = (EditText)findViewById(R.id.Name3);
         cacv = new CustomAutoCompleteView(RegisterActivity.this);
+        cacvName= new CustomAutoCompleteView(RegisterActivity.this);
+
         enAdap = new ArrayAdapter<String>(RegisterActivity.this, android.R.layout.simple_dropdown_item_1line, enNums);
+        nameAdap = new ArrayAdapter<String>(RegisterActivity.this, android.R.layout.simple_dropdown_item_1line, stdNames);
+        cacv.setThreshold(1);
         cacv.setAdapter(enAdap);
         enAdap.notifyDataSetChanged();
+        cacvName.setThreshold(1);
+        cacvName.setAdapter(nameAdap);
+        nameAdap.notifyDataSetChanged();
+
         teamName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         entryNum1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         entryNum2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
@@ -70,9 +90,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         entryNum2.addTextChangedListener(new CustomTextWatcher(entryNum2,1,cacv,enAdap));
         entryNum3.addTextChangedListener(new CustomTextWatcher(entryNum3,1,cacv,enAdap));
-        name1.addTextChangedListener(new CustomTextWatcher(name1,2));
-        name2.addTextChangedListener(new CustomTextWatcher(name2,2));
-        name3.addTextChangedListener(new CustomTextWatcher(name3,2));
+        name1.addTextChangedListener(new CustomTextWatcher(name1,2,cacvName,nameAdap));
+        name2.addTextChangedListener(new CustomTextWatcher(name2,2,cacvName,nameAdap));
+        name3.addTextChangedListener(new CustomTextWatcher(name3,2,cacvName,nameAdap));
         submit =(Button)findViewById(R.id.submitNames);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,20 +111,48 @@ public class RegisterActivity extends AppCompatActivity {
         studentName1=name1.getText().toString().toUpperCase();
         studentName2=name2.getText().toString().toUpperCase();
         studentName3=name3.getText().toString().toUpperCase();
-        if(!(validate1.validate_entryno(entryNumber1)||validate1.validate_entryno(entryNumber2)||validate1.validate_entryno(entryNumber3)||validate1.validate_name(studentName1)||validate1.validate_name(studentName2)||validate1.validate_name(studentName3))){
-            return;
-        }
-        //Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
-        CheckNetwork chkNet = new CheckNetwork(RegisterActivity.this);
-        String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
-        if(chkNet.checkNetwork()){
-            VolleySingleton.getInstance(RegisterActivity.this).getRequestQueue().getCache().clear();
+        if((validate1.validate_entryno(entryNumber1)&&validate1.validate_entryno(entryNumber2)&& validate1.validate_entryno(entryNumber3)&& validate1.validate_name(studentName1)&& validate1.validate_name(studentName2)&& validate1.validate_name(studentName3))) {
 
-            //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
-              //      entryNumber2, studentName2,
+            //Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
+            CheckNetwork chkNet = new CheckNetwork(RegisterActivity.this);
+            String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
+            if (chkNet.checkNetwork()) {
+                VolleySingleton.getInstance(RegisterActivity.this).getRequestQueue().getCache().clear();
+
+                //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
+                //      entryNumber2, studentName2,
                 //    entryNumber3, studentName3, RegisterActivity.this);
+            } else {
+                Tools.showAlertDialog("Internet Unavailable", RegisterActivity.this);
+            }
         }else{
-            Tools.showAlertDialog("Internet Unavailable", RegisterActivity.this);
+            if (sound == null) {
+                if(!validate1.validate_entryno(entryNumber1)){
+                    sound = MediaPlayer.create(this, R.raw.sentry1);
+                }else if(!validate1.validate_entryno(entryNumber2)){
+                    sound = MediaPlayer.create(this, R.raw.sentry2);
+                }else if(!validate1.validate_entryno(entryNumber3)){
+                    sound = MediaPlayer.create(this, R.raw.sentry3);
+                }else if(!validate1.validate_name(studentName1)|| !validate1.validate_name(studentName2) ||!validate1.validate_name(studentName3)){
+                    sound = MediaPlayer.create(this, R.raw.name);
+                }
+               // sound = MediaPlayer.create(RegisterActivity.this, R.raw.team_name);
+                //sound = MediaPlayer.create(this, R.raw.sentry1);
+
+                //dsound = MediaPlayer.create(con,R.raw.data_not_posted);
+                //dsound = MediaPlayer.create(con,R.raw.user_already_registered);
+                //dsound = MediaPlayer.create(con,R.raw.registration_completed);
+                sound.start();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        sound.release();
+                        sound = null;
+                    }
+                }, sound.getDuration());
+            }else {
+                Toast.makeText(RegisterActivity.this, "Have some patience duh...", Toast.LENGTH_SHORT).show();
+            }
         }
     }
     boolean doubleBackToExitPressedOnce=false;

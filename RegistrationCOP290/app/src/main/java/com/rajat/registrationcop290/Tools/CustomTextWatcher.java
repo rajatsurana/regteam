@@ -1,5 +1,6 @@
 package com.rajat.registrationcop290.Tools;
 
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -12,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 
 import com.rajat.registrationcop290.R;
+import com.rajat.registrationcop290.RegisterActivity;
 
 /**
  * Created by Rajat on 14-01-2016.
@@ -39,7 +41,7 @@ public class CustomTextWatcher implements TextWatcher {
     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
     @Override
     public void onTextChanged(CharSequence userInput, int i, int i1, int i2) {
-        if(id==1){
+        if(id==1 || id==2){
              /*
                     List<Models> products = databaseH.readModels(userInput.toString());
                     int rowCount = products.size();
@@ -54,19 +56,20 @@ public class CustomTextWatcher implements TextWatcher {
                     }
                     */
             //con.item = mainActivity.getItemsFromDb(userInput.toString());
-            String[] model = new String[3];
+            /*String[] model = new String[3];
             String[] one= {"Dont","Dont","Dont"};
             String[] two= {"PDont","PDont","PDont"};
             if(userInput.toString().equals("P")){
                 model=two;
             }else{
                 model=one;
-            }
+            }*/
             if(cv!=null && cvAdapter!=null){
+                //cv.dismissDropDown();
                 // update the adapater
-                cvAdapter.notifyDataSetChanged();
+                /*cvAdapter.notifyDataSetChanged();
                 cvAdapter = new ArrayAdapter<String>(cv.getContext(), android.R.layout.simple_dropdown_item_1line, model);
-                cv.setAdapter(cvAdapter);
+                cv.setAdapter(cvAdapter);*/
                 //cv.showDropDown();
                 cvDrop();
 
@@ -77,14 +80,14 @@ public class CustomTextWatcher implements TextWatcher {
     public void afterTextChanged(Editable editable) {
 
         if (editable.length() == 0) {
-            eText.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.home,0);
+            eText.setCompoundDrawablesWithIntrinsicBounds(0,0, 0,0);
         } else {
             if(id==1){
                 if(!(validation.validate_entryno(eText.getText().toString()))){
-                    eText.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.abc_btn_radio_material,0);
+                    eText.setCompoundDrawablesWithIntrinsicBounds(0,0, R.drawable.cclose,0);
                 }
                 else{
-                    eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.about, 0);
+                    eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ccheck, 0);
                 }
                 cvSelect();
                 //cv.getDropDownBackground();
@@ -92,15 +95,15 @@ public class CustomTextWatcher implements TextWatcher {
             }
             else if(id==2){
                 if(!(validation.validate_name(eText.getText().toString()))) {
-                    eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.abc_btn_radio_material, 0);
+                    eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.cclose, 0);
                 }
                 else{
-                    eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.about, 0);
+                    eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ccheck, 0);
                 }
-
+                cvSelect();
             }
             else{
-                eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.about, 0);
+                eText.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
             }
         }
@@ -111,14 +114,16 @@ public void cvDrop(){
     Log.i("rajat", "cv.isPopUpShowing: " + cv.isPopupShowing() + " cv.isFocusable(); " + cv.isFocusable());
     final int[] edTextLocation = new int[2];
     eText.getLocationOnScreen(edTextLocation);
-    //cv.setText(editText.getText());
+    cv.setText(eText.getText());
     cv.setVerticalScrollBarEnabled(true);
     cv.setDropDownBackgroundResource(R.color.ultraLightGray);
-    cv.setDropDownHeight(400);
+    //cv.setDropDownHeight(400);
+    cv.setDropDownHeight(eText.getHeight()*5);
+    
     cv.setDropDownWidth(eText.getWidth());
     cv.setDropDownHorizontalOffset(edTextLocation[0]);
     cv.setDropDownVerticalOffset(edTextLocation[1] + eText.getHeight());
-    Handler h = new Handler();
+   /* Handler h = new Handler();
     h.postDelayed(new Runnable() {
         @Override
         public void run() {
@@ -135,7 +140,7 @@ public void cvDrop(){
 
             //Looper.loop();
         }
-    }, 2000);
+    }, 2000);*/
    //eText.getLocationOnScreen();
         try {
             new Handler().postDelayed(new Runnable() {
@@ -158,10 +163,6 @@ public void cvDrop(){
     public void cvSelect(){
         if (cv != null) {
 
-
-
-
-
             Log.i("rajat", "cv.isPopUpShowing: " + cv.isPopupShowing() + " cv.isFocusable(); " + cv.isFocusable());
             cv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -169,7 +170,7 @@ public void cvDrop(){
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     Log.i("rajat", "cv.onItemClickCalled: " + adapterView.getItemAtPosition(i));
 
-                    eText.setText(i + " " + l + " " + adapterView.getItemAtPosition(i));
+                    eText.setText(adapterView.getItemAtPosition(i)+"");//i + " " + l + " " +
                     dropOrNot=false;
                     cv.dismissDropDown();
 
@@ -185,4 +186,5 @@ public void cvDrop(){
             });
         }
     }
+
 }
