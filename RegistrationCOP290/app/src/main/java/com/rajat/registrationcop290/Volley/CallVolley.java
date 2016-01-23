@@ -2,6 +2,7 @@ package com.rajat.registrationcop290.Volley;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.util.Log;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -9,23 +10,24 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.rajat.registrationcop290.R;
 import com.rajat.registrationcop290.Tools.Tools;
 import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 public class CallVolley {
         private static ProgressDialog pDialog;
-
+               private static MediaPlayer dsound=null;
         private static void setCustomRetryPolicy(StringRequest jsonObjReq) {
                 Log.i("rajat", "setCustomRetryPolicy");
                 jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS*2, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         }
 
-        public static void makeSubmissionCall(String url, final String teamname,final String entrynum1,final String name1,final String entrynum2,final String name2,final String entrynum3,final String name3, final Context context)
+        public static void makeRegistrationCall(String url, final String teamname,final String entrynum1,final String name1,final String entrynum2,final String name2,final String entrynum3,final String name3, final Context context)
         {
                 pDialog=  Tools.showProgressBar(context);
 
-                RequestQueue queue = VolleySingleton.getInstance(context).getRequestQueue();
+                //RequestQueue queue = VolleySingleton.getInstance(context).getRequestQueue();
 
                         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>()
                         {
@@ -62,6 +64,7 @@ public class CallVolley {
                                 @Override
                                 protected Map<String, String> getParams()
                                 {
+                                        Log.i("rajat", " onResponseParamsExecute");
                                         Map<String, String> params = new HashMap<String, String>();
 
                                         try {
@@ -73,6 +76,7 @@ public class CallVolley {
                                                 params.put("name2",name2);
                                                 params.put("entry3",entrynum3);
                                                 params.put("name3",name3);
+                                                Log.i("rajat","request: "+params);
                                         }
                                         catch (Exception e)
                                         {
@@ -104,10 +108,14 @@ public class CallVolley {
                                                 if(message.equals("Data not posted!"))
                                                 {
                                                         Tools.showAlertDialog("Data not posted!",con);
+                                                        dsound = MediaPlayer.create(con,R.raw.data_not_posted);
+                                                        dsound.start();
                                                 }
-                                                else if(message.equals("User Already Registered"))
+                                                else if(message.equals("User already registered"))
                                                 {
                                                         Tools.showAlertDialog("User Already Registered",con);
+                                                        dsound = MediaPlayer.create(con,R.raw.user_already_registered);
+                                                        dsound.start();
                                                 }
                                         }
                                         else
@@ -115,7 +123,8 @@ public class CallVolley {
                                                 if(message.equals("Registration completed"))
                                                 {
                                                         Tools.showAlertDialog("Registration completed",con);
-
+                                                        dsound = MediaPlayer.create(con, R.raw.registration_completed);
+                                                        dsound.start();
 
                                                 }
                                         }
