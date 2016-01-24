@@ -3,6 +3,7 @@
     package="com.rajat.registrationcop290" >
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_cop290"
@@ -10,7 +11,8 @@
         android:theme="@style/reg" >
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

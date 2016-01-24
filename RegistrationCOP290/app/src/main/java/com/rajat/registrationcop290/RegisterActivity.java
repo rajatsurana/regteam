@@ -1,8 +1,10 @@
 package com.rajat.registrationcop290;
 
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -11,11 +13,12 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import com.rajat.registrationcop290.Tools.CheckNetwork;
-import com.rajat.registrationcop290.Tools.CustomAutoCompleteView;
 import com.rajat.registrationcop290.Tools.CustomTextWatcher;
 import com.rajat.registrationcop290.Tools.Student;
 import com.rajat.registrationcop290.Tools.Tools;
@@ -23,16 +26,13 @@ import com.rajat.registrationcop290.Tools.Validate;
 import com.rajat.registrationcop290.Volley.CallVolley;
 import com.rajat.registrationcop290.Volley.VolleySingleton;
 
-import java.io.UnsupportedEncodingException;
-
-
 public class RegisterActivity extends AppCompatActivity {
     MediaPlayer sound = null;
     Toolbar toolbar;
     int titleId;
-    CustomAutoCompleteView cacv;
+    AutoCompleteTextView cacv;
     public ArrayAdapter<String> enAdap;
-    CustomAutoCompleteView cacvName;
+    AutoCompleteTextView cacvName;
     public ArrayAdapter<String> nameAdap;
     public String[] enNums = new String[] {"Please search...","Don't search...","Please search...","Don't search...","Please search...","Don't search..."};
     public String[] stdNames = new String[] {"Please search...","Don't search...","Please search...","Don't search...","Please search...","Don't search..."};
@@ -44,21 +44,35 @@ public class RegisterActivity extends AppCompatActivity {
             entryNumber1="", entryNumber2="", entryNumber3="",
             studentName1="", studentName2="", studentName3="";
     Button submit;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.main_lay);
+        Animation a = AnimationUtils.loadAnimation(this, R.anim.scale_up);
+        layout.startAnimation(a);
         toolbar=(Toolbar)findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
         titleId = getResources().getIdentifier("action_bar_title", "id", "android");
         setTitle((Html.fromHtml("<font color=\"#FFFFFF\">" + "Registration COP290" + "</font>")));
-        Student.getS();
-        //ugetS();
-        Student.getEntryNum();
-        Student.getNames();
-        enNums=Student.studentEntryNum;
-        stdNames=Student.studentNames;
-        initializeViews();
+        Handler handler = new Handler();
+        final Runnable r = new Runnable() {
+            public void run() {
+                Student.getS();
+                Student.getEntryNum();
+                Student.getNames();
+                enNums=Student.studentEntryNum;
+                stdNames=Student.studentNames;
+                initializeViews();
+            }
+        };
+        handler.postDelayed(r, 200);
     }
     public void initializeViews(){
         teamName = (EditText)findViewById(R.id.team_name);
@@ -68,9 +82,8 @@ public class RegisterActivity extends AppCompatActivity {
         name1 = (EditText)findViewById(R.id.Name1);
         name2 = (EditText)findViewById(R.id.Name2);
         name3 = (EditText)findViewById(R.id.Name3);
-        cacv = new CustomAutoCompleteView(RegisterActivity.this);
-        cacvName= new CustomAutoCompleteView(RegisterActivity.this);
-
+        cacv = new AutoCompleteTextView(RegisterActivity.this);
+        cacvName= new AutoCompleteTextView(RegisterActivity.this);
         enAdap = new ArrayAdapter<String>(RegisterActivity.this, android.R.layout.simple_dropdown_item_1line, enNums);
         nameAdap = new ArrayAdapter<String>(RegisterActivity.this, android.R.layout.simple_dropdown_item_1line, stdNames);
         cacv.setThreshold(1);
@@ -79,17 +92,15 @@ public class RegisterActivity extends AppCompatActivity {
         cacvName.setThreshold(1);
         cacvName.setAdapter(nameAdap);
         nameAdap.notifyDataSetChanged();
-
         teamName.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         entryNum1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         entryNum2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         entryNum3.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-        //name1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-        //name2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-        //name3.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        name1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        name2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        name3.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         teamName.addTextChangedListener(new CustomTextWatcher(teamName,0));
         entryNum1.addTextChangedListener(new CustomTextWatcher(entryNum1,1,cacv,enAdap));
-
         entryNum2.addTextChangedListener(new CustomTextWatcher(entryNum2,1,cacv,enAdap));
         entryNum3.addTextChangedListener(new CustomTextWatcher(entryNum3,1,cacv,enAdap));
         name1.addTextChangedListener(new CustomTextWatcher(name1,2,cacvName,nameAdap));
@@ -105,7 +116,6 @@ public class RegisterActivity extends AppCompatActivity {
     }
     public void onSubmitClick(){
         Validate validate1=new Validate();
-        //boolean invalid=false;
         TeamName =teamName.getText().toString();
         entryNumber1=entryNum1.getText().toString().toUpperCase();
         entryNumber2=entryNum2.getText().toString().toUpperCase();
@@ -156,8 +166,6 @@ public class RegisterActivity extends AppCompatActivity {
             }else{
                 valid=true;
             }
-            //Toast.makeText(RegisterActivity.this,"Submit Clicked",Toast.LENGTH_SHORT).show();
-
         }else{
             if (sound == null) {
                 if(teamName.getText().length()==0){
@@ -188,39 +196,38 @@ public class RegisterActivity extends AppCompatActivity {
             }
         }
         if(valid){
+            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            // Vibrate for 200 milliseconds
+            v.vibrate(200);
             CheckNetwork chkNet = new CheckNetwork(RegisterActivity.this);
             String URL = "http://agni.iitd.ernet.in/cop290/assign0/register/";
             if (chkNet.checkNetwork()) {
                 VolleySingleton.getInstance(RegisterActivity.this).getRequestQueue().getCache().clear();
 
-                //CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
-                //      entryNumber2, studentName2,
-                //    entryNumber3, studentName3, RegisterActivity.this);
+                CallVolley.makeRegistrationCall(URL, TeamName, entryNumber1, studentName1,
+                      entryNumber2, studentName2,
+                    entryNumber3, studentName3, RegisterActivity.this);
             } else {
                 Tools.showAlertDialog("Internet Unavailable", RegisterActivity.this);
             }
         }else{
             final Animation animat= AnimationUtils.loadAnimation(this, R.anim.shake);
             submit.startAnimation(animat);
-            //int i=0;
+            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            // Vibrate for 200 milliseconds
+            v.vibrate(200);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
                     submit.startAnimation(animat);
                 }
             },100);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-
                     submit.startAnimation(animat);
                 }
             }, 200);
-
-
-
-
         }
     }
     boolean doubleBackToExitPressedOnce=false;
@@ -230,17 +237,14 @@ public class RegisterActivity extends AppCompatActivity {
             super.onBackPressed();
             return;
         }
-
         this.doubleBackToExitPressedOnce = true;
         Toast.makeText(this, "Press BACK again to exit", Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
-
             @Override
             public void run() {
                 doubleBackToExitPressedOnce = false;
             }
         }, 2000);
     }
-
 }
