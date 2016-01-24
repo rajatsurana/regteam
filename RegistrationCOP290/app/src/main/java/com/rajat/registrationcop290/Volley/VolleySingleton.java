@@ -17,59 +17,31 @@ public class VolleySingleton {
 
     private static VolleySingleton mInstance;
     private RequestQueue mRequestQueue;
-    private ImageLoader mImageLoader;
     private static Context mCtx;
 
-
-
+//constructor
     public VolleySingleton(Context context) {
         mCtx = context;
         mRequestQueue = getRequestQueue();
-        mImageLoader = new ImageLoader(mRequestQueue,
-                new ImageLoader.ImageCache() {
-                    private final LruCache<String, Bitmap>
-                            cache = new LruCache<String, Bitmap>(20);
-
-                    @Override
-                    public Bitmap getBitmap(String url) {
-                        return cache.get(url);
-                    }
-
-                    @Override
-                    public void putBitmap(String url, Bitmap bitmap) {
-                        cache.put(url, bitmap);
-                    }
-                });
-
-
     }
-
+// get instance of volleysingleton
     public static synchronized VolleySingleton getInstance(Context context) {
         if (mInstance == null) {
             mInstance = new VolleySingleton(context);
         }
         return mInstance;
     }
-
+//get request queue to pass request into
     public RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             Log.i("rajat", "getRequestQueue");
-            // getApplicationContext() is key, it keeps you from leaking the
-            // Activity or BroadcastReceiver if someone passes one in.
             mRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext());
         }
         return mRequestQueue;
     }
-
+//request is added in request queue
     public <T> void addToRequestQueue(Request<T> req) {
         Log.i("rajat", "addToRequestQueue");
         getRequestQueue().add(req);
     }
-
-    public ImageLoader getImageLoader() {
-        return mImageLoader;
-    }
-
-
-
 }

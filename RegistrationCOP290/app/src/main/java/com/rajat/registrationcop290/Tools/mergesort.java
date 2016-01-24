@@ -1,15 +1,16 @@
 package com.rajat.registrationcop290.Tools;
 
-
 /**
  * Created by Lenovo on 1/19/2016.
  */
 
     public class mergesort {
+    //create a sorted array
         public mergesort(String[] tobe){
             String[] aux=new String[tobe.length];
             sort(tobe,aux,0,tobe.length-1);
         }
+    //merge the sortes subarrays
         private void merge(String[] tobe,String[] aux,int start,int mid,int end){
             for(int k=start;k<=end;k++){
                 aux[k]=tobe[k];
@@ -22,6 +23,7 @@ package com.rajat.registrationcop290.Tools;
                 else{tobe[k]=aux[j++];}
             }
         }
+    //sort the subarrays
         private void sort(String[] tobe,String[] aux,int i,int j){
             if (j<=i)return;
             int mid=i+((j-i)/2);

@@ -4,6 +4,7 @@ public class Student {
 	public static String[][] student = new String[235][2];
 	public static String[] studentEntryNum = new String[235];
 	public static String[] studentNames = new String[235];
+	//database of students to show in suggestions
 	public static void getS() {
 		student[0][0] = "Waghmare Saurabh Milind".toUpperCase();
 		student[0][1] = "2014cs10268".toUpperCase();

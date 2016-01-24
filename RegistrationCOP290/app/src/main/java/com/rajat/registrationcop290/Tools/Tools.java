@@ -13,7 +13,7 @@ import java.util.Locale;
 
 public class Tools {
     public static AlertDialog blackalert;
-
+//creates a progress bar
     public static ProgressDialog showProgressBar(Context c) {
         ProgressDialog progressDialog = new ProgressDialog(c,R.style.DialogTheme);
         progressDialog.setMessage("Please Wait...");
@@ -21,7 +21,7 @@ public class Tools {
         progressDialog.show();
         return progressDialog;
     }
-
+// creates an alert dialog box
     public static void showAlertDialog(String message,Context con)
     {
         final AlertDialog.Builder alert = new AlertDialog.Builder(con,R.style.DialogTheme);
@@ -38,16 +38,4 @@ public class Tools {
         blackalert.show();
     }
 
-    public static String getDateTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        Date date = new Date();
-        return dateFormat.format(date);
-    }
 }
-
-/*DisplayMetrics displayMetrics = new DisplayMetrics();
-        WindowManager wm = (WindowManager) c.getSystemService(Context.WINDOW_SERVICE);
-        wm.getDefaultDisplay().getMetrics(displayMetrics);
-        int width = displayMetrics.widthPixels;
-        int height = displayMetrics.heightPixels;*/

@@ -16,9 +16,9 @@ public class CheckNetwork {
         this.context=c;
     }
 
-
+    // check whether wifi of cell data is available or not
+    //requires access_network permissions during installation
     public  boolean checkNetwork() {
-
         boolean wifiDataAvailable = false;
         boolean mobileDataAvailable = false;
         try {	ConnectivityManager conManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -35,7 +35,6 @@ public class CheckNetwork {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
         return wifiDataAvailable || mobileDataAvailable;
     }
 }
